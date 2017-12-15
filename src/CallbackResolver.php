@@ -55,7 +55,7 @@ class CallbackResolver implements CallbackResolverInterface
             [a-zA-Z0-9_]+         # end with [a-zA-Z0-9_]
         )?
     )
-    ([:]{1,2}|->)                      # method operator
+    ([:]{1,2}|->)                 # method operator
     ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*) # method
 $`x
 REGEXP;
