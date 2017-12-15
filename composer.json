@@ -1,5 +1,5 @@
 {
-    "name": "apatis/resolver_callable",
+    "name": "apatis/callback_resolver",
     "description": "Callable Resolver",
     "type": "library",
     "require": {
