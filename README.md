@@ -35,7 +35,7 @@ $callable_closure_std_class = $resolver->resolve(function() {
 
 ## OPERATOR
 
-```php
+```text
  - Use operator single `:` or `->` to determine that class need to be new instance
  - Use double `:` (eg : 'class::method') to determine that method is static or will be convert like a (standard) `->` operator if method is non static
 ```
