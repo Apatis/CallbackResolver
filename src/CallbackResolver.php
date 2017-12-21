@@ -55,19 +55,40 @@ class CallbackResolver implements CallbackResolverInterface
             [a-zA-Z0-9_]+         # end with [a-zA-Z0-9_]
         )?
     )
-    ([:]{1,2}|->)                      # method operator
+    (
+        ->|[:@]    # standard method object use -> , : , or @
+        | [:]{2}   # static method ::
+    )                           # method operator use default -> and ::
     ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*) # method
 $`x
 REGEXP;
 
     /**
+     * @var bool Determine object to resolve static default true
+     */
+    protected $resolveStaticMethod = true;
+
+    /**
      * CallbackResolver constructor.
      *
      * @param mixed|null|false $binding false to disable binding
+     * @param bool $resolveStaticMethod Resolve static method if on method to resolve determine
+     *                                  as static method
      */
-    public function __construct($binding = false)
+    public function __construct($binding = false, $resolveStaticMethod = true)
     {
-        $this->binding = $binding;
+        $this->binding             = $binding;
+        $this->resolveStaticMethod = (bool) $resolveStaticMethod;
+    }
+
+    /**
+     * Set static method need to be resolve or not
+     *
+     * @param bool $resolveStaticMethod
+     */
+    public function setResolveStaticMethod(bool $resolveStaticMethod)
+    {
+        $this->resolveStaticMethod = $resolveStaticMethod;
     }
 
     /**
@@ -95,6 +116,11 @@ REGEXP;
 
                 // resolve is method contains double colon (static method)
                 if ($operator === '::') {
+                    // if static set as non resolvable
+                    if ($this->resolveStaticMethod === false) {
+                        return $resolved;
+                    }
+
                     try {
                         $reflection = new \ReflectionMethod($class, $method);
                     } catch (\Throwable $e) {

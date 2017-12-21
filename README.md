@@ -8,7 +8,8 @@ use \Apatis\CallbackResolver\CallbackResolver;
 
 // use null to bind closure to null
 $bind = null;
-$resolver = new CallbackResolver($bind);
+$resolveStaticMethod = true;
+$resolver = new CallbackResolver($bind, $resolveStaticMethod);
 
 $callable_1 = $resolver->resolve('Class:method');
 // Class:method is equal with Class->method
@@ -36,6 +37,8 @@ $callable_closure_std_class = $resolver->resolve(function() {
 ## OPERATOR
 
 ```php
- - Use operator single `:` or `->` to determine that class need to be new instance
- - Use double `:` (eg : 'class::method') to determine that method is static or will be convert like a (standard) `->` operator if method is non static
+ - Use operator single `:` , `@` or `->` to determine that class need to be new instance
+ - Use double `:` (eg : 'class::method') to determine that method is static 
+        will be convert like a (standard) `->` operator if method is non static
+        and set as resolve static method
 ```
