@@ -57,7 +57,7 @@ class CallbackResolver implements CallbackResolverInterface
     )
     (
         ->|[:@]    # standard method object use -> , : , or @
-        | [:]{2}   # static method ::
+        |[:]{2}   # static method ::
     )                           # method operator use default -> and ::
     ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*) # method
 $`x
