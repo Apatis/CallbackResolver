@@ -43,20 +43,22 @@ class CallbackResolver implements CallbackResolverInterface
      */
     const REGEX_CALLABLE_CLASS = <<<'REGEXP'
 `^(
-        [\\\]?                    # start with backslash
-        [a-zA-Z_]                 # 2nd char with letter or underscore
         (?:
+            [\\\]?                    # start with backslash
+            [a-zA-Z_]                 # 2nd char with letter or underscore
             (?:
-                \\\?              # maybe start backslash name space separator
                 (?:
-                    [a-zA-Z0-9_]+ # valid class identifier
-                )
-            )*
-            [a-zA-Z0-9_]+         # end with [a-zA-Z0-9_]
-        )?
-    )
+                    \\\?              # maybe start backslash name space separator
+                    (?:
+                        [a-zA-Z0-9_]+ # valid class identifier
+                    )
+                )*
+                [a-zA-Z0-9_]+         # end with [a-zA-Z0-9_]
+            )?
+        )+
+    ) # class
     (
-        ->|[:@]    # standard method object use -> , : , or @
+        ->|[@]    # standard method object use -> , : , or @
         |[:]{2}   # static method ::
     )                           # method operator use default -> and ::
     ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*) # method
@@ -139,9 +141,25 @@ REGEXP;
                 }
             }
 
-            $binding = $this->getBinding();
-            $resolved = [new $class($binding), $method];
-        } elseif (!is_callable($resolved)) {
+            $ref = new \ReflectionClass($class);
+            if ($ref->isInstantiable()) {
+                $binding = $this->getBinding();
+                $resolved = [new $class($binding), $method];
+            }
+            // strict mode
+            /*
+            elseif ($ref->hasMethod($method) && ! $ref->getMethod($method)->isStatic()) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Method %s not as a static method that class %s is not instantiable',
+                        $method,
+                        $class
+                    )
+                );
+            }*/
+        }
+
+        if (!is_callable($resolved)) {
             throw new \RuntimeException(
                 sprintf(
                     '%s is not resolvable',
