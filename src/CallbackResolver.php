@@ -157,6 +157,26 @@ REGEXP;
                     )
                 );
             }*/
+        } elseif (is_array($toResolve) && count($toResolve) === 2 && is_callable($toResolve)) {
+            $class = reset($toResolve);
+            $method = next($toResolve);
+            if (is_string($class)) {
+                try {
+                    $ref = new \ReflectionClass($class);
+                    if ($ref->hasMethod($method)) {
+                        $refMethod = $ref->getMethod($method);
+                        if ($ref->isInstantiable()
+                            && $refMethod->isPublic()
+                            && ! $refMethod->isStatic()
+                        ) {
+                            $binding  = $this->getBinding();
+                            $resolved = [new $class($binding), $method];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // pass
+                }
+            }
         }
 
         if (!is_callable($resolved)) {
