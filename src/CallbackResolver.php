@@ -157,10 +157,10 @@ REGEXP;
                     )
                 );
             }*/
-        } elseif (is_array($toResolve) && count($toResolve) === 2 && is_callable($toResolve)) {
+        } elseif (is_array($toResolve) && count($toResolve) === 2) {
             $class = reset($toResolve);
             $method = next($toResolve);
-            if (is_string($class)) {
+            if (is_string($class) && is_string($method)) {
                 try {
                     $ref = new \ReflectionClass($class);
                     if ($ref->hasMethod($method)) {
