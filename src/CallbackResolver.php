@@ -99,6 +99,24 @@ REGEXP;
     public function resolve($toResolve) : callable
     {
         $resolved = $toResolve;
+        if (is_array($toResolve) && count($toResolve) === 1) {
+            $resolveArrayReset = reset($toResolve);
+            if (is_callable($resolveArrayReset)) {
+                return $resolveArrayReset;
+            } elseif (is_string($resolveArrayReset)) {
+                try {
+                    $ref = new \ReflectionClass($resolveArrayReset);
+                    if ($ref->isInstantiable() && $ref->hasMethod('__invoke')) {
+                        return [$ref->newInstance($this->getBinding()), '__invoke'];
+                    }
+                } catch (\Exception $e) {
+                    // pass
+                }
+            } elseif (is_object($resolveArrayReset) && method_exists($resolveArrayReset, '__invoke')) {
+                return [$resolveArrayReset, '__invoke'];
+            }
+        }
+
         if (is_string($toResolve)) {
             $class  = $toResolve;
             $method = '__invoke';
